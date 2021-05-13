@@ -1,0 +1,32 @@
+version: '3'
+services:
+  tc-informix:
+    image: "appiriodevops/tc-database-scripts:latest"
+    hostname: informix.cloud.topcoder.com
+    container_name: iif_innovator_c
+    environment: 
+      LICENSE: accept
+    ports:
+      - "2021:2021"
+      - "2022:2022"
+      - "27017:27017"
+      - "27018:27018"
+      - "27883:27883"
+    tty: true
+  legacy-challenge-migration-cli:
+    build: 
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: legacy-challenge-migration-cli:latest
+    container_name: legacy-challenge-migration-cli
+    ports:
+      - 3001:3001
+    volumes: 
+      - "..:/app"
+    environment: 
+      - INFORMIX_HOST=tc-informix
+    stdin_open: true
+    tty: true
+    links: 
+      - "tc-informix"
+    command: bash
