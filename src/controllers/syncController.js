@@ -1,6 +1,6 @@
 const {
   PAYMENT_STATUSES,
-  PAYMENT_STATUS_REASON
+  PAYMENT_STATUS_REASONS
 } = require('config')
 const logger = require('../util/logger')
 const paymentInformixService = require('../services/paymentInformixService')
@@ -21,22 +21,21 @@ async function syncOpenPayments () {
         const taxFormExists = await paymentInformixService.getTaxStatusForUserId(item.user_id)
         logger.debug(`taxFormExists Repsonse: ${JSON.stringify(taxFormExists)}`)
 
-        if(taxFormExists) {
+        if (taxFormExists.length > 0) {
           await paymentInformixService.updatePaymentStatus(
             item.payment_detail_id,
             PAYMENT_STATUSES.OWED
           )
-        } else { 
+        } else {
           await paymentInformixService.updatePaymentStatus(
             item.payment_detail_id,
             PAYMENT_STATUSES.ON_HOLD,
-            PAYMENT_STATUS_REASON.WAITING_FOR_TAX_FORM
+            PAYMENT_STATUS_REASONS.WAITING_FOR_TAX_FORM
           )
         }
-        
       }
     } catch (e) {
-      
+      logger.error(`Main Catch ${e}`)
     }
   }
 }
