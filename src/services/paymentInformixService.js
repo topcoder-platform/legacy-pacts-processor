@@ -85,8 +85,8 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
   }
   const deleteQuery = util.format(DELETE_PAYMENT_STATUS_REASON, paymentDetailId)
   try {
-    // await execQuery(deleteQuery)
-    logger.debug(`updatePaymentStatus: Executing Delete Query - ${deleteQuery}`)
+    // logger.debug(`updatePaymentStatus: Executing Delete Query - ${deleteQuery}`)
+    await execQuery(deleteQuery)
   } catch (e) {
     throw new Error(`updatePaymentStatus deleteQuery Error - ${e} - Query: ${deleteQuery}`)
   }
@@ -94,8 +94,8 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
   // update payment status
   const updateQuery = util.format(UPDATE_PAYMENT_STATUS, statusId)
   try {
-    // await execQuery(updateQuery)
     logger.debug(`updatePaymentStatus: Executing Update Query - ${updateQuery}`)
+    await execQuery(updateQuery)
   } catch (e) {
     throw new Error(`updatePaymentStatus updateQuery Error - ${e} - Query: ${updateQuery}`)
   }
@@ -104,8 +104,8 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
     // INSERT_PAYMENT_STATUS_REASON
     const insertStatusReasonQuery = util.format(INSERT_PAYMENT_STATUS_REASON, paymentDetailId, statusReasonId)
     try {
-      // await execQuery(insertStatusReasonQuery)
       logger.debug(`updatePaymentStatus: Executing Insert Query - ${insertStatusReasonQuery}`)
+      await execQuery(insertStatusReasonQuery)
     } catch (e) {
       throw new Error(`updatePaymentStatus insertStatusReasonQuery Error - ${e} - Query: ${insertStatusReasonQuery}`)
     }

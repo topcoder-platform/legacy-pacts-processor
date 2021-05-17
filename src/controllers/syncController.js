@@ -5,14 +5,15 @@ const {
 const logger = require('../util/logger')
 const paymentInformixService = require('../services/paymentInformixService')
 
-let running = false
+// let running = false
 
 async function syncOpenPayments () {
   const queuedPayments = await paymentInformixService.getOpenPayments();
   if (queuedPayments.length <= 0) {
-    running = false
+    // running = false
     logger.info(`Sync :: 0 Payments with status of ${PAYMENT_STATUSES.ON_HOLD} for sync`)
     // break
+    return true
   } else {
     logger.debug(`Sync :: Syncing [${queuedPayments.length}] Payments`)
     try {
@@ -34,6 +35,8 @@ async function syncOpenPayments () {
           )
         }
       }
+
+      return true
     } catch (e) {
       logger.error(`Main Catch ${e}`)
     }

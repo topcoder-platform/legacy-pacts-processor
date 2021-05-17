@@ -13,12 +13,12 @@ services:
       - "27018:27018"
       - "27883:27883"
     tty: true
-  legacy-challenge-migration-cli:
+  legacy-pacts-processor:
     build: 
       context: ../
       dockerfile: docker/Dockerfile
-    image: legacy-challenge-migration-cli:latest
-    container_name: legacy-challenge-migration-cli
+    image: legacy-pacts-processor:latest
+    container_name: legacy-pacts-processor
     ports:
       - 3001:3001
     volumes: 
