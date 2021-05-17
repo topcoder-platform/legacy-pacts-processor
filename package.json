@@ -4,6 +4,7 @@
   "description": "Progresses payments in the informix tables to Owed",
   "repository": "https://github.com/topcoder-platform/legacy-pacts-processor",
   "dependencies": {
+    "topcoder-healthcheck-dropin": "^1.0.2",
     "bluebird": "^3.5.5",
     "config": "^3.1.0",
     "hashmap": "^2.4.0",
