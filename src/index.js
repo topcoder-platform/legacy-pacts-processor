@@ -20,7 +20,7 @@ process.on('unhandledRejection', (reason, p) => {
 if (config.SYNC_ENABLED === true) {
   const syncRule = new schedule.RecurrenceRule()
   syncRule.minute = new schedule.Range(0, 59, config.SYNC_INTERVAL)
-  schedule.scheduleJob(syncRule, syncController.syncPactsPayments)
+  schedule.scheduleJob(syncRule, syncController.syncOpenPayments)
   logger.info(`The sync is scheduled to be executed every ${config.SYNC_INTERVAL} minutes`)
 } else {
   logger.info(`Sync Disabled by Config: ${config.SYNC_ENABLED}`)

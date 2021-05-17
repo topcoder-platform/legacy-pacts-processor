@@ -8,7 +8,7 @@ const paymentInformixService = require('../services/paymentInformixService')
 // let running = false
 
 async function syncOpenPayments () {
-  const queuedPayments = await paymentInformixService.getOpenPayments();
+  const queuedPayments = await paymentInformixService.getOpenPayments()
   if (queuedPayments.length <= 0) {
     // running = false
     logger.info(`Sync :: 0 Payments with status of ${PAYMENT_STATUSES.ON_HOLD} for sync`)
@@ -44,5 +44,5 @@ async function syncOpenPayments () {
 }
 
 module.exports = {
-  syncOpenPayments,
+  syncOpenPayments
 }
