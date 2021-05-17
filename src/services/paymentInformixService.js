@@ -60,7 +60,7 @@ FROM user_tax_form_xref utf
 WHERE utf.user_id = %d
 AND utf.status_id = ${TAX_FORM_STATUS.ACTIVE}`
 
-const UPDATE_PAYMENT_STATUS = 'UPDATE payment_detail SET payment_status_id = %d'
+const UPDATE_PAYMENT_STATUS = 'UPDATE payment_detail SET payment_status_id = %d WHERE payment_detail_id = %d'
 
 // make sure id is not null - FIRST 1
 const DELETE_PAYMENT_STATUS_REASON = 'DELETE from payment_detail_status_reason_xref WHERE payment_detail_id = %d'
@@ -92,7 +92,7 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
   }
 
   // update payment status
-  const updateQuery = util.format(UPDATE_PAYMENT_STATUS, statusId)
+  const updateQuery = util.format(UPDATE_PAYMENT_STATUS, statusId, paymentDetailId)
   try {
     logger.debug(`updatePaymentStatus: Executing Update Query - ${updateQuery}`)
     await execQuery(updateQuery)
