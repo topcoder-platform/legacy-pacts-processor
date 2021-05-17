@@ -48,7 +48,7 @@ jobs:
     environment:
       DEPLOY_ENV: "DEV"
       LOGICAL_ENV: "dev"
-      APPNAME: "legacy-payment-processor"
+      APPNAME: "legacy-pacts-processor"
     steps: *builddeploy_steps
 
   "build-prod":
