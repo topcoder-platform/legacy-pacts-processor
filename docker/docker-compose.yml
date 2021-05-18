@@ -1,32 +1,8 @@
 version: '3'
 services:
-  tc-informix:
-    image: "appiriodevops/tc-database-scripts:latest"
-    hostname: informix.cloud.topcoder.com
-    container_name: iif_innovator_c
-    environment: 
-      LICENSE: accept
-    ports:
-      - "2021:2021"
-      - "2022:2022"
-      - "27017:27017"
-      - "27018:27018"
-      - "27883:27883"
-    tty: true
   legacy-pacts-processor:
-    build: 
-      context: ../
-      dockerfile: docker/Dockerfile
     image: legacy-pacts-processor:latest
     container_name: legacy-pacts-processor
-    ports:
-      - 3001:3001
-    volumes: 
-      - "..:/app"
-    environment: 
-      - INFORMIX_HOST=tc-informix
-    stdin_open: true
-    tty: true
-    links: 
-      - "tc-informix"
-    command: bash
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
