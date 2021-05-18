@@ -123,6 +123,7 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
       const insertStatusReasonQuery = await prepare(connection, INSERT_PAYMENT_STATUS_REASON)
       await insertStatusReasonQuery.executeAsync([paymentDetailId, statusReasonId])
     }
+    await connection.commitTransactionAsync()
     logger.info(`Payment Status Updated - Payment Detail ID: ${paymentDetailId} Status ID: ${statusId}  Status Reason ID: ${statusReasonId}`)
     return true
   } catch (e) {
