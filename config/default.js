@@ -18,7 +18,7 @@ module.exports = {
 
   INFORMIX: {
     SERVER: process.env.INFORMIX_SERVER || 'informixoltp_tcp', // informix server
-    DATABASE: process.env.INFORMIX_DATABASE || 'tcs_catalog', // informix database
+    DATABASE: process.env.INFORMIX_DATABASE || 'informixoltp', // informix database
     HOST: process.env.INFORMIX_HOST || 'localhost', // host
     PROTOCOL: process.env.INFORMIX_PROTOCOL || 'onsoctcp',
     PORT: process.env.INFORMIX_PORT || '2021', // port
