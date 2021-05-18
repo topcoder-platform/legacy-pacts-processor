@@ -1,12 +1,25 @@
 // const _ = require('lodash')
 const util = require('util')
 const logger = require('../util/logger')
+const helper = require('../common/helper')
+
 const {
   PAYMENT_STATUSES,
   PAYMENT_STATUS_REASONS,
   TAX_FORM_STATUS
 } = require('config')
-const { executeQueryAsync } = require('../util/informixWrapper')
+
+/**
+ * Prepare Informix statement
+ * @param {Object} connection the Informix connection
+ * @param {String} sql the sql
+ * @return {Object} Informix statement
+ */
+async function prepare (connection, sql) {
+  logger.debug(`Preparing SQL ${sql}`)
+  const stmt = await connection.prepareAsync(sql)
+  return Promise.promisifyAll(stmt)
+}
 
 /**
  Removed Columns
@@ -47,22 +60,45 @@ FROM user_tax_form_xref utf
 WHERE utf.user_id = %d
 AND utf.status_id = ${TAX_FORM_STATUS.ACTIVE}`
 
-const UPDATE_PAYMENT_STATUS = 'UPDATE payment_detail SET payment_status_id = %d WHERE payment_detail_id = %d'
+const UPDATE_PAYMENT_STATUS = 'UPDATE payment_detail SET payment_status_id = ? WHERE payment_detail_id = ?'
 
 // make sure id is not null - FIRST 1
-const DELETE_PAYMENT_STATUS_REASON = 'DELETE from payment_detail_status_reason_xref WHERE payment_detail_id = %d'
-const INSERT_PAYMENT_STATUS_REASON = 'INSERT INTO payment_detail_status_reason_xref (payment_detail_id, payment_status_reason_id) VALUES(%d, %d)'
+const DELETE_PAYMENT_STATUS_REASON = 'DELETE from payment_detail_status_reason_xref WHERE payment_detail_id = ?'
+const INSERT_PAYMENT_STATUS_REASON = 'INSERT INTO payment_detail_status_reason_xref (payment_detail_id, payment_status_reason_id) VALUES(?, ?)'
 
 async function getOpenPayments () {
-  logger.debug(`getOpenPayments - ${QUERY_GET_PAYMENTS}`)
-  return execQuery(QUERY_GET_PAYMENTS)
+  const connection = await helper.getInformixConnection()
+  try {
+    // await connection.beginTransactionAsync()
+
+    logger.debug(`getOpenPayments - ${QUERY_GET_PAYMENTS}`)
+    return await connection.queryAsync(QUERY_GET_PAYMENTS)
+    // await connection.commitTransactionAsync()
+  } catch (e) {
+    logger.error(`Error in 'getGroupsForChallenge' ${e}`)
+    // await connection.rollbackTransactionAsync()
+    throw e
+  } finally {
+    await connection.closeAsync()
+  }
 }
 
 async function getTaxStatusForUserId (userId) {
-  // QUERY_GET_TAX_STATUS
-  const query = util.format(QUERY_GET_TAX_STATUS, userId)
-  logger.debug(`getTaxStatusForUserId - ${query}`)
-  return execQuery(query)
+  const connection = await helper.getInformixConnection()
+
+  try {
+    // await connection.beginTransactionAsync()
+    const query = util.format(QUERY_GET_TAX_STATUS, userId)
+    logger.debug(`getOpenPayments - ${query}`)
+    return await connection.queryAsync(query)
+    // await connection.commitTransactionAsync()
+  } catch (e) {
+    logger.error(`Error in 'getGroupsForChallenge' ${e}`)
+    // await connection.rollbackTransactionAsync()
+    throw e
+  } finally {
+    await connection.closeAsync()
+  }
 }
 
 async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
@@ -70,48 +106,32 @@ async function updatePaymentStatus (paymentDetailId, statusId, statusReasonId) {
   if (!paymentDetailId || paymentDetailId <= 1) {
     throw new Error(`Invalid paymentDetailId ${paymentDetailId}`)
   }
-  const deleteQuery = util.format(DELETE_PAYMENT_STATUS_REASON, paymentDetailId)
+  const connection = await helper.getInformixConnection()
   try {
-    // logger.debug(`updatePaymentStatus: Executing Delete Query - ${deleteQuery}`)
-    await execQuery(deleteQuery)
-  } catch (e) {
-    throw new Error(`updatePaymentStatus deleteQuery Error - ${e} - Query: ${deleteQuery}`)
-  }
+    await connection.beginTransactionAsync()
 
-  // update payment status
-  const updateQuery = util.format(UPDATE_PAYMENT_STATUS, statusId, paymentDetailId)
-  try {
-    logger.debug(`updatePaymentStatus: Executing Update Query - ${updateQuery}`)
-    await execQuery(updateQuery)
-  } catch (e) {
-    throw new Error(`updatePaymentStatus updateQuery Error - ${e} - Query: ${updateQuery}`)
-  }
+    const deleteQuery = await prepare(connection, DELETE_PAYMENT_STATUS_REASON)
+    await deleteQuery.executeAsync([paymentDetailId])
 
-  if (statusReasonId) {
-    // INSERT_PAYMENT_STATUS_REASON
-    const insertStatusReasonQuery = util.format(INSERT_PAYMENT_STATUS_REASON, paymentDetailId, statusReasonId)
-    try {
-      logger.debug(`updatePaymentStatus: Executing Insert Query - ${insertStatusReasonQuery}`)
-      await execQuery(insertStatusReasonQuery)
-    } catch (e) {
-      throw new Error(`updatePaymentStatus insertStatusReasonQuery Error - ${e} - Query: ${insertStatusReasonQuery}`)
+    // update payment status
+    // const updateQuery = util.format(UPDATE_PAYMENT_STATUS, statusId, paymentDetailId)
+    const updateQuery = await prepare(connection, UPDATE_PAYMENT_STATUS)
+    await updateQuery.executeAsync([statusId, paymentDetailId])
+
+    if (statusReasonId) {
+      // INSERT_PAYMENT_STATUS_REASON
+      const insertStatusReasonQuery = await prepare(connection, INSERT_PAYMENT_STATUS_REASON)
+      await insertStatusReasonQuery.executeAsync([paymentDetailId, statusReasonId])
     }
+    logger.info(`Payment Status Updated - Payment Detail ID: ${paymentDetailId} Status ID: ${statusId}  Status Reason ID: ${statusReasonId}`)
+    return true
+  } catch (e) {
+    logger.error(`Error in 'updatePaymentStatus' ${e}, rolling back transaction`)
+    await connection.rollbackTransactionAsync()
+    throw e
+  } finally {
+    await connection.closeAsync()
   }
-  return true
-}
-
-/**
- * Execute query
- *
- * @param {Object} conn informix connection instance
- * @param {String} sql sql
- * @param {String} order addition sql for ordering
- */
-async function execQuery (sql) {
-  // logger.debug('execQuery start')
-  const result = await executeQueryAsync('informixoltp', sql)
-  // logger.debug('execQuery end')
-  return result
 }
 
 module.exports = {

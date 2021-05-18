@@ -8,7 +8,7 @@
     "bluebird": "^3.5.5",
     "config": "^3.1.0",
     "hashmap": "^2.4.0",
-    "informix-wrapper": "git+https://github.com/appirio-tech/informix-wrapper.git#less-logs",
+    "ifxnjs": "^10.0.5",
     "lodash": "^4.17.21",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.28",
