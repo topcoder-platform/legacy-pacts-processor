@@ -1,26 +1,13 @@
 # Legacy Challenge Migration CLI Tool
 
-Migration script used to migrate Challenges, Resources, and Resource Roles from Informix to DynamoDB.
-It runs on a scheduled basis and also on-demand by exposing an API allowing admins to manually trigger the migration.
-
-### Development deployment status
-[![CircleCI](https://circleci.com/gh/topcoder-platform/legacy-challenge-migration-script/tree/develop.svg?style=svg)](https://circleci.com/gh/topcoder-platform/legacy-challenge-migration-script/tree/develop)
-
-### Production deployment status
-[![CircleCI](https://circleci.com/gh/topcoder-platform/legacy-challenge-migration-script/tree/master.svg?style=svg)](https://circleci.com/gh/topcoder-platform/legacy-challenge-migration-script/tree/master)
+Reviews informix tables for payments created by v5 legacy-payment-processor and moves them through the payment process
 
 ## Intended use
-- Data migration script to move v4/Informix to v5 Dynamo/ES
-
-## Related repos
-- [Challenge API](https://github.com/topcoder-platform/challenge-api)
-- [Resources API](https://github.com/topcoder-platform/resources-api)
+- Mimic PACTs processing of payments from status Entered to status Owed
 
 ## Prerequisites
 
 -  [NodeJS](https://nodejs.org/en/) 
--  [Elasticsearch](https://www.elastic.co/)(v6.3.1)
--  [DynamoDB](https://aws.amazon.com/dynamodb/)
 -  [Informix](https://www.ibm.com/cloud/informix)
 -  [Docker](https://www.docker.com/)(CE 17+)
 -  [Docker Compose](https://docs.docker.com/compose/)
@@ -29,14 +16,10 @@ It runs on a scheduled basis and also on-demand by exposing an API allowing admi
 
 See `config/default.js`. Most of them is self explain there.
 - `PORT`: API server port; default to `3001`
-- `API_VERSION`: API version; default to `v5`
-- `SCHEDULE_INTERVAL`: the interval of schedule; default to `5`(minutes)
-- `CHALLENGE_TYPE_API_URL` Challenge v4 api url from which challenge types data are fetched.
-- `CHALLENGE_TIMELINE_API_URL` Challenge v5 api url from which challenge timelines are fetched.
-- `CREATED_DATE_BEGIN` A filter; if set, only records in informix created after the date are migrated.
-- `BATCH_SIZE` Maximum legacy will be load at 1 query
-- `ERROR_LOG_FILENAME` Filename for data that error to migrate.
-- `RESOURCE_ROLE` List of resource role to be included in migration
+- `SYNC_INTERVAL`: the interval of schedule; default to `5`(minutes)
+- `SYNC_ENABLED`: if the sync should run. Allows you to turn off the service via config
+- `LOG_LEVEL`: default info
+- `INFORMIX`: object of properties to connect to informix
 
 ## Local Deployment
 ### Foreman Setup
@@ -59,31 +42,3 @@ After container has been run, go to container shell and install dependencies:
 docker exec -ti legacy-challenge-migration-cli bash
 npm i
 ```
-
-### Command for API
-- Inside the docker container, start the express server: `npm start`
-
-## Migrations
-### For local migrations
-There are two parts need to be updated for local migrations,
-- `./src/models/challenge.js`
-`throughput: 'ON_DEMAND',` should be updated to `throughput:{ read: 4, write: 2 },`
-- `./config/default.js`
-Two aws config should be uncommented
-
-and env variable `IS_LOCAL_DB` should be set to true before you continue to the next steps.
-
-### Run a migration
-- To run a migration, the command should be:
-`MIGRATION=<name-of-migration-file> nf run npm run migrate`
-Example: 
-`MIGRATION=001-migrate-taskData nf run npm run migrate`
-
-## Production deployment
-- TBD
-
-## Running tests
-- TBD
-
-## Running tests in CI
-- TBD
