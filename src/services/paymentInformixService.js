@@ -64,7 +64,7 @@ const UPDATE_PAYMENT_STATUS = 'UPDATE payment_detail SET payment_status_id = %d 
 
 // make sure id is not null - FIRST 1
 const DELETE_PAYMENT_STATUS_REASON = 'DELETE from payment_detail_status_reason_xref WHERE payment_detail_id = %d'
-const INSERT_PAYMENT_STATUS_REASON = 'INSERT INTO payment_detail_status_reason_xref (payment_detail_id, payment_detail_status_reason_id) VALUES(%d, %d)'
+const INSERT_PAYMENT_STATUS_REASON = 'INSERT INTO payment_detail_status_reason_xref (payment_detail_id, payment_status_reason_id) VALUES(%d, %d)'
 
 async function getOpenPayments () {
   logger.debug(`getOpenPayments - ${QUERY_GET_PAYMENTS}`)
