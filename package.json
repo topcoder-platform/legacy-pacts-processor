@@ -26,6 +26,9 @@
     "lint": "standard",
     "lint:fix": "standard --fix"
   },
+  "engines": {
+    "node": "10.x"
+  },
   "author": "TCSCODER",
   "license": ""
 }
