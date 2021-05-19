@@ -1,18 +1,10 @@
 module.exports = {
   PORT: process.env.PORT || 3001,
-  SYNC_INTERVAL: process.env.SYNC_INTERVAL ? Number(process.env.SYNC_INTERVAL) : 2, // minutes
-  SYNC_ENABLED: process.env.SYNC_ENABLED ? process.env.SYNC_ENABLED === 'true' : true,
+  PROCESS_ON_HOLD_ENABLED: process.env.PROCESS_ON_HOLD_ENABLED ? process.env.PROCESS_ON_HOLD_ENABLED === 'true' : false,
+  PROCESS_ON_HOLD_INTERVAL: process.env.PROCESS_ON_HOLD_INTERVAL ? Number(process.env.PROCESS_ON_HOLD_INTERVAL) : 2, // minutes
 
-  // AUTH_SECRET: process.env.AUTH_SECRET || 'mysecret',
-  // VALID_ISSUERS: process.env.VALID_ISSUERS || '["https://api.topcoder-dev.com", "https://api.topcoder.com", "https://topcoder-dev.auth0.com/"]',
-
-  // // used to get M2M token
-  // AUTH0_URL: process.env.AUTH0_URL,
-  // AUTH0_PROXY_SERVER_URL: process.env.AUTH0_PROXY_SERVER_URL,
-  // AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE || 'https://www.topcoder-dev.com',
-  // TOKEN_CACHE_TIME: process.env.TOKEN_CACHE_TIME || 90,
-  // AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
-  // AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
+  PROCESS_ACCRUING_ENABLED: process.env.PROCESS_ACCRUING_ENABLED ? process.env.PROCESS_ACCRUING_ENABLED === 'true' : false,
+  PROCESS_ACCRUING_INTERVAL: process.env.PROCESS_ACCRUING_INTERVAL ? Number(process.env.PROCESS_ACCRUING_INTERVAL) : 2, // minutes
 
   LOG_LEVEL: process.env.LOG_LEVEL || 'info',
 
